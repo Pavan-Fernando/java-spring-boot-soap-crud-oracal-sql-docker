@@ -4,50 +4,26 @@
            xmlns:tns="http://example.com/soap/crud"
            elementFormDefault="qualified">
 
+    <!-- User Type -->
     <xs:complexType name="User">
         <xs:sequence>
             <xs:element name="id" type="xs:long" minOccurs="0"/>
-            <xs:element name="name" type="tns:NameType"/>
-            <xs:element name="email" type="tns:EmailType"/>
-            <xs:element name="phone" type="tns:PhoneType"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="email" type="xs:string"/>
+            <xs:element name="phone" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
-    <!-- Name: 2–50 chars, letters & spaces -->
-    <xs:simpleType name="NameType">
-        <xs:restriction base="xs:string">
-            <xs:minLength value="2"/>
-            <xs:maxLength value="50"/>
-            <xs:pattern value="[A-Za-z\s\-]+"/>
-        </xs:restriction>
-    </xs:simpleType>
-
-    <!-- Email: RFC-compliant -->
-    <xs:simpleType name="EmailType">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[^@]+@[^@]+\.[^@]+"/>
-            <xs:maxLength value="100"/>
-        </xs:restriction>
-    </xs:simpleType>
-
-    <!-- Phone: +94 or 10 digits -->
-    <xs:simpleType name="PhoneType">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="(\+94[0-9]{9})|([0-9]{10})"/>
-        </xs:restriction>
-    </xs:simpleType>
-
-    <!-- CRUD Operations -->
+    <!-- CREATE -->
     <xs:element name="CreateUserRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="name" type="tns:NameType"/>
-                <xs:element name="email" type="tns:EmailType"/>
-                <xs:element name="phone" type="tns:PhoneType"/>
+                <xs:element name="name" type="xs:string"/>
+                <xs:element name="email" type="xs:string"/>
+                <xs:element name="phone" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
     <xs:element name="CreateUserResponse">
         <xs:complexType>
             <xs:sequence>
@@ -56,5 +32,64 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- Add GetUserRequest, UpdateUserRequest, DeleteUserRequest similarly -->
+    <!-- GET -->
+    <xs:element name="GetUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user" type="tns:User" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- UPDATE -->
+    <xs:element name="UpdateUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+                <xs:element name="name" type="xs:string" minOccurs="0"/>
+                <xs:element name="email" type="xs:string" minOccurs="0"/>
+                <xs:element name="phone" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UpdateUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user" type="tns:User"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- DELETE -->
+    <xs:element name="DeleteUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DeleteUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- GET ALL -->
+    <xs:element name="GetAllUsersRequest"/>
+    <xs:element name="GetAllUsersResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user" type="tns:User" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 </xs:schema>

@@ -8,6 +8,8 @@ import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 @Service
 @Validated
 public class UserServiceImpl implements UserService {
@@ -44,6 +46,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User get(Long id) {
         return repo.findById(id).orElseThrow();
+    }
+
+    @Override
+    public List<User> getAll() {
+        return repo.findAll();
     }
 
     private void validate(User u) {
