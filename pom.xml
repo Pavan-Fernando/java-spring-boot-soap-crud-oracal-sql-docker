@@ -18,27 +18,17 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<jaxb2-maven-plugin.version>3.1.0</jaxb2-maven-plugin.version>
 	</properties>
 
 	<dependencies>
-		<!-- Spring Web Services -->
+		<!-- Spring Boot Web Services (includes jakarta.xml.ws-api with WSDL) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>
 		</dependency>
 
-		<!-- Spring Data JPA -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<!-- JAXB -->
+		<!-- Jakarta XML Bind -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
@@ -50,10 +40,11 @@
 			<version>4.0.5</version>
 		</dependency>
 
-		<!-- Validation -->
+		<!-- CXF WSDL Runtime (for ExtensibilityElement) -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-wsdl</artifactId>
+			<version>4.0.5</version>
 		</dependency>
 
 		<!-- Lombok -->
@@ -71,52 +62,72 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- Jakarta WSDL API + Implementation -->
+		<!-- Test -->
 		<dependency>
-			<groupId>jakarta.xml.ws</groupId>
-			<artifactId>jakarta.xml.ws-api</artifactId>
-			<version>4.0.1</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring Boot JPA -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.xml.ws</groupId>
-			<artifactId>jaxws-rt</artifactId>
-			<version>4.0.2</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+			<version>3.5.7</version>
+		</dependency>
+
+		<!-- PostgreSQL -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<!-- JAXB Code Generation -->
-			<plugin>
-				<groupId>org.jvnet.jaxb</groupId>
-				<artifactId>jaxb-maven-plugin</artifactId>
-				<version>4.0.8</version>
-				<executions>
-					<execution>
-						<id>generate-jaxb</id>
-						<phase>generate-sources</phase>
-						<goals><goal>generate</goal></goals>
-					</execution>
-				</executions>
-				<configuration>
-					<schemaDirectory>src/main/resources/wsdl</schemaDirectory>
-					<schemaIncludes><include>user.xsd</include></schemaIncludes>
-					<!-- CHANGE THIS TO YOUR PACKAGE -->
-					<generatePackage>com.example.backend.spring.boot.soap.wsdl</generatePackage>
-					<generateDirectory>${project.build.directory}/generated-sources/jaxb</generateDirectory>
-					<produceObjectFactory>true</produceObjectFactory>
-					<extension>true</extension>
-				</configuration>
-			</plugin>
-
-			<!-- Spring Boot -->
+			<!-- Spring Boot plugin (version inherited) -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<!-- ==== JAXB2 PLUGIN (the one that creates wsdl package) ==== -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>${jaxb2-maven-plugin.version}</version>
+
+				<!-- Bind to the generate-sources phase -->
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<phase>generate-sources</phase>
+						<goals><goal>xjc</goal></goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<!-- Where the XSD lives -->
+					<sources>
+						<source>${project.basedir}/src/main/resources/wsdl</source>
+					</sources>
+
+					<!-- Java package for generated classes -->
+					<packageName>com.example.backend.spring.boot.soap.wsdl</packageName>
+
+					<!-- Output folder (Maven will add it to the classpath) -->
+					<outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
+
+					<!-- Clean previous generation -->
+					<clearOutputDir>false</clearOutputDir>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>
